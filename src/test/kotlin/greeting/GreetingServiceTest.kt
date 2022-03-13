@@ -8,6 +8,6 @@ class GreetingServiceTest {
     @Test
     fun `The GreetingService will return an empty list before any messages have been stored`() {
         val service = GreetingService()
-        assertThat(service.getGreetings()).size().isEqualTo(1)
+        assertThat(service.greet(service.getWorld())).isEqualTo("Hello world!")
     }
 }

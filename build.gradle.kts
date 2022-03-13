@@ -4,6 +4,7 @@ plugins {
     kotlin("jvm") version "1.6.0"
     kotlin("plugin.spring") version "1.6.0"
     idea
+    jacoco
     id("com.softeq.gradle.itest") version "1.0.4"
     id("com.github.ben-manes.versions") version "0.42.0"
 }
@@ -54,5 +55,10 @@ tasks {
         useJUnitPlatform {
             excludeTags("smoke")
         }
+    }
+
+    withType<JacocoReport> {
+        dependsOn(test, integrationTest)
+        executionData(fileTree("$buildDir/jacoco/").include("**/*.exec"))
     }
 }
