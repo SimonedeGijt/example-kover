@@ -1,19 +1,19 @@
+import kotlinx.kover.api.KoverTaskExtension
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     kotlin("jvm") version "1.6.0"
     kotlin("plugin.spring") version "1.6.0"
     idea
-    jacoco
+    id("org.jetbrains.kotlinx.kover") version "0.5.0"
     id("com.softeq.gradle.itest") version "1.0.4"
     id("com.github.ben-manes.versions") version "0.42.0"
 }
 
-group = "example.ktlint"
+group = "org.example"
 version = "1.0-SNAPSHOT"
 
 repositories {
-    // Must-have
     mavenCentral()
 }
 
@@ -55,10 +55,11 @@ tasks {
         useJUnitPlatform {
             excludeTags("smoke")
         }
-    }
 
-    withType<JacocoReport> {
-        dependsOn(test, integrationTest)
-        executionData(fileTree("$buildDir/jacoco/").include("**/*.exec"))
+        extensions.configure(KoverTaskExtension::class) {
+            isDisabled = false
+            // binaryReportFile.set(file("$buildDir/custom/result.bin"))
+            includes = listOf("org.example.*")
+        }
     }
 }
