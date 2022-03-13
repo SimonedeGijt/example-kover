@@ -5,6 +5,7 @@ plugins {
     kotlin("jvm") version "1.6.0"
     kotlin("plugin.spring") version "1.6.0"
     idea
+//    jacoco
     id("org.jetbrains.kotlinx.kover") version "0.5.0"
     id("com.softeq.gradle.itest") version "1.0.4"
     id("com.github.ben-manes.versions") version "0.42.0"
@@ -57,9 +58,48 @@ tasks {
         }
 
         extensions.configure(KoverTaskExtension::class) {
-            isDisabled = false
-            // binaryReportFile.set(file("$buildDir/custom/result.bin"))
+            isDisabled = false // Instrumentation classes
+//            binaryReportFile.set(file("$buildDir/custom/result.bin")) // has an issue; see https://github.com/Kotlin/kotlinx-kover/issues/152
             includes = listOf("org.example.*")
+            excludes = listOf("*Test*", "*Application*")
         }
     }
+
+    koverHtmlReport {
+        includes = listOf("org.example.*")
+        excludes = listOf("*Test*", "*Application*")
+    }
+
+    koverVerify {
+        includes = listOf("org.example.*")
+        excludes = listOf("*Test*", "*Application*")
+
+        // The plugin currently only supports line counter values.
+        // For future improvements, see https://github.com/Kotlin/kotlinx-kover/issues/128
+
+        rule {
+            name = "Minimal line coverage rate in percent"
+            bound {
+                minValue = 100
+            }
+        }
+    }
+
+    check.get().dependsOn(koverHtmlReport)
+
+//    withType<JacocoReport> {
+//        dependsOn(test, integrationTest)
+//        executionData(fileTree("$buildDir/jacoco/").include("**/*.exec"))
+//    }
+}
+
+kover {
+    isDisabled = false // Instrumentation classes
+    coverageEngine.set(kotlinx.kover.api.CoverageEngine.INTELLIJ) // change instrumentation agent and reporter
+    generateReportOnCheck = false // false to do not execute `koverMergedReport` task before `check` task
+    disabledProjects =
+        setOf() // setOf("project-name") to disable coverage for project with name `project-name`
+    instrumentAndroidPackage = false // true to instrument packages `android.*` and `com.android.*`
+    runAllTestsForProjectTask =
+        false // true to run all tests in all projects if `koverHtmlReport`, `koverXmlReport`, `koverReport`, `koverVerify` or `check` tasks executed on some project
 }
