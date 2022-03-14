@@ -4,8 +4,8 @@ plugins {
     kotlin("jvm") version "1.6.0"
     kotlin("plugin.spring") version "1.6.0"
     idea
-    jacoco
-//    id("org.jetbrains.kotlinx.kover") version "0.5.0"
+//    jacoco
+    id("org.jetbrains.kotlinx.kover") version "0.5.0"
     id("com.softeq.gradle.itest") version "1.0.4"
     id("com.github.ben-manes.versions") version "0.42.0"
 }
@@ -51,17 +51,17 @@ tasks {
         }
     }
 
-    withType<JacocoReport> {
-        dependsOn(test, integrationTest)
-        executionData(fileTree("$buildDir/jacoco/").include("**/*.exec"))
-    }
+//    withType<JacocoReport> {
+//        dependsOn(test, integrationTest)
+//        executionData(fileTree("$buildDir/jacoco/").include("**/*.exec"))
+//    }
 
     withType<Test> {
         useJUnitPlatform {
             excludeTags("smoke")
         }
 
-//        extensions.configure(KoverTaskExtension::class) {
+//        extensions.configure(kotlinx.kover.api.KoverTaskExtension::class) {
 //            isDisabled = false // Instrumentation classes
 // //            binaryReportFile.set(file("$buildDir/custom/result.bin")) // has an issue; see https://github.com/Kotlin/kotlinx-kover/issues/152
 //            includes = listOf("org.example.*")
@@ -73,6 +73,8 @@ tasks {
 //        includes = listOf("org.example.*")
 //        excludes = listOf("*Test*", "*Application*")
 //    }
+//
+//    check.get().dependsOn(koverHtmlReport)
 
     /**
      * The plugin currently only supports line counter values.
@@ -89,11 +91,9 @@ tasks {
 //            }
 //        }
 //    }
-//
-//    check.get().dependsOn(koverHtmlReport)
 }
-//
-// kover {
+
+//kover {
 //    isDisabled = false // Instrumentation classes
 //    coverageEngine.set(kotlinx.kover.api.CoverageEngine.INTELLIJ) // change instrumentation agent and reporter
 //    generateReportOnCheck = false // false to do not execute `koverMergedReport` task before `check` task
@@ -102,4 +102,4 @@ tasks {
 //    instrumentAndroidPackage = false // true to instrument packages `android.*` and `com.android.*`
 //    runAllTestsForProjectTask =
 //        false // true to run all tests in all projects if `koverHtmlReport`, `koverXmlReport`, `koverReport`, `koverVerify` or `check` tasks executed on some project
-// }
+//}
