@@ -6,7 +6,7 @@ private const val HELLO = "Hello"
 
 @Service
 class GreetingService {
-    fun standardGreet() = "$HELLO ${getWorld()}!"
+    fun standardGreet() = "$HELLO peeps!"
 
     fun greet(s: String?) = if (s.isNullOrEmpty()) standardGreet() else "$HELLO $s!"
 

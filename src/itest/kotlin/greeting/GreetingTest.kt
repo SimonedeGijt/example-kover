@@ -14,7 +14,7 @@ class GreetingTest : WebIntegrationTest() {
             status { isOk() }
             content {
                 contentType(APPLICATION_JSON)
-                jsonPath("$", equalTo("Hello world!"))
+                jsonPath("$", equalTo("Hello peeps!"))
             }
         }.andDo { print() }
     }
