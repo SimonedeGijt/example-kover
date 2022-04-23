@@ -93,7 +93,7 @@ tasks {
 //    }
 }
 
-//kover {
+// kover {
 //    isDisabled = false // Instrumentation classes
 //    coverageEngine.set(kotlinx.kover.api.CoverageEngine.INTELLIJ) // change instrumentation agent and reporter
 //    generateReportOnCheck = false // false to do not execute `koverMergedReport` task before `check` task
@@ -102,4 +102,4 @@ tasks {
 //    instrumentAndroidPackage = false // true to instrument packages `android.*` and `com.android.*`
 //    runAllTestsForProjectTask =
 //        false // true to run all tests in all projects if `koverHtmlReport`, `koverXmlReport`, `koverReport`, `koverVerify` or `check` tasks executed on some project
-//}
+// }
