@@ -5,7 +5,7 @@ plugins {
     kotlin("plugin.spring") version "1.6.0"
     idea
 //    jacoco
-    id("org.jetbrains.kotlinx.kover") version "0.5.0"
+    id("org.jetbrains.kotlinx.kover") version "0.5.1"
     id("com.softeq.gradle.itest") version "1.0.4"
     id("com.github.ben-manes.versions") version "0.42.0"
 }
