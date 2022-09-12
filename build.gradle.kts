@@ -1,11 +1,11 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-    kotlin("jvm") version "1.6.0"
-    kotlin("plugin.spring") version "1.6.0"
+    kotlin("jvm") version "1.7.10"
+    kotlin("plugin.spring") version "1.7.10"
     idea
 //    jacoco
-    id("org.jetbrains.kotlinx.kover") version "0.5.1"
+    id("org.jetbrains.kotlinx.kover") version "0.6.0"
     id("com.softeq.gradle.itest") version "1.0.4"
     id("com.github.ben-manes.versions") version "0.42.0"
 }
@@ -47,7 +47,7 @@ tasks {
     withType<KotlinCompile> {
         kotlinOptions {
             freeCompilerArgs = listOf("-Xjsr305=strict")
-            jvmTarget = JavaVersion.VERSION_11.toString()
+            jvmTarget = JavaVersion.VERSION_17.toString()
         }
     }
 
@@ -60,44 +60,60 @@ tasks {
         useJUnitPlatform {
             excludeTags("smoke")
         }
-
-//        extensions.configure(kotlinx.kover.api.KoverTaskExtension::class) {
-//            isDisabled = false // Instrumentation classes
-// //            binaryReportFile.set(file("$buildDir/custom/result.bin")) // has an issue; see https://github.com/Kotlin/kotlinx-kover/issues/152
-//            includes = listOf("org.example.*")
-//            excludes = listOf("*Application*")
-//        }
     }
 
-//    koverMergedHtmlReport {
-//        includes = listOf("org.example.*")
-//        excludes = listOf("*Test*", "*Application*")
-//    }
+    kover {
+        isDisabled.set(false) // default; put to true to disable instrumentation and all Kover tasks in this project
+        engine.set(kotlinx.kover.api.DefaultIntellijEngine) // default; other engine option is Jacoco
 
-    /**
-     * The plugin currently only supports line counter values.
-     * For future improvements, see https://github.com/Kotlin/kotlinx-kover/issues/128
-     */
-//    koverVerify {
-//        includes = listOf("org.example.*")
-//        excludes = listOf("*Test*", "*Application*")
-//
-//        rule {
-//            name = "Minimal line coverage rate in percent"
-//            bound {
-//                minValue = 100
-//            }
-//        }
-//    }
+        // you can override these filters on a few different levels
+        // but as I don't really see the additional value doing that, I'm not including it
+        // please view Kover Github if you feel you need this functionality
+        filters {
+            classes {
+//            includes += "com.example.*"
+                excludes += listOf("*Test*", "*Application*")
+            }
+        }
+
+        instrumentation {
+            excludeTasks += "dummy-tests" // set of test tasks names to exclude from instrumentation.
+            // The results of their execution will not be presented in the report
+        }
+
+        xmlReport {
+            onCheck.set(true) // true to run koverHtmlReport task during the execution of the check task (if it exists) of the current project
+            reportFile.set(layout.buildDirectory.file("utrechtJUG/result.xml")) // change report file name
+        }
+
+        htmlReport {
+            onCheck.set(true) // true to run koverHtmlReport task during the execution of the check task (if it exists) of the current project
+            reportDir.set(layout.buildDirectory.dir("utrechtJUG/html-result")) // change report directory
+        }
+
+        verify {
+            onCheck.set(true) // true to run koverVerify task during the execution of the check task (if it exists) of the current project
+
+            rule {
+                name = "Minimal branch coverage rate in percent" // optional custom name
+                isEnabled = true // default
+                target =
+                    kotlinx.kover.api.VerificationTarget.ALL // specify by which entity the code for separate coverage evaluation will be grouped
+                bound {
+                    minValue = 100
+                    counter = kotlinx.kover.api.CounterType.BRANCH // default LINE
+                    valueType = kotlinx.kover.api.VerificationValueType.COVERED_PERCENTAGE // default
+                }
+            }
+            rule {
+                name = "Minimal line coverage rate in percent"
+
+                bound {
+                    minValue = 100
+                    counter = kotlinx.kover.api.CounterType.LINE // default
+                    valueType = kotlinx.kover.api.VerificationValueType.COVERED_PERCENTAGE // default
+                }
+            }
+        }
+    }
 }
-
-//kover {
-//    isDisabled = false // Instrumentation classes
-//    coverageEngine.set(kotlinx.kover.api.CoverageEngine.INTELLIJ) // change instrumentation agent and reporter
-//    generateReportOnCheck = false // false to do not execute `koverMergedReport` task before `check` task
-//    disabledProjects =
-//        setOf() // setOf("project-name") to disable coverage for project with name `project-name`
-//    instrumentAndroidPackage = false // true to instrument packages `android.*` and `com.android.*`
-//    runAllTestsForProjectTask =
-//        false // true to run all tests in all projects if `koverHtmlReport`, `koverXmlReport`, `koverReport`, `koverVerify` or `check` tasks executed on some project
-//}
